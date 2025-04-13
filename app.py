@@ -158,33 +158,31 @@ if st.session_state.suggested_portfolio:
             st.markdown(f"**{info.get('name', coin)} ({coin})** — {symbol}{amount_display:,.2f}")
             st.caption(info.get("desc", ""))
 
+    # ============ INVESTMENT INSIGHTS ============
+    st.subheader("🧠 Investment Insights")
 
-# ============ INVESTMENT INSIGHTS ============
+    for coin, amount in sorted_portfolio:
+        info = coin_info.get(coin, {})
+        weight = amount / st.session_state.investment
+        reasoning = ""
 
-st.subheader("🧠 Investment Insights")
+        # Insight logic
+        if weight >= 0.3:
+            reasoning += "This coin has a **high weight**, reflecting strong confidence in its long-term stability or market dominance. "
+        elif weight >= 0.15:
+            reasoning += "This coin has a **moderate allocation**, indicating it's considered a core part of this risk profile. "
+        else:
+            reasoning += "This coin is a **smaller allocation**, possibly due to its niche use case or volatility. "
 
-for coin, amount in sorted_portfolio:
-    info = coin_info.get(coin, {})
-    weight = amount / st.session_state.investment
-    reasoning = ""
+        if coin in ["BTC", "ETH", "USDC"]:
+            reasoning += "It's a well-established coin with high market cap, suitable for preserving value."
+        elif coin in ["SOL", "MATIC", "LINK", "DOT", "ATOM"]:
+            reasoning += "This coin supports DeFi, scalability, or cross-chain features — aligned with growth sectors."
+        else:
+            reasoning += "It's a newer or emerging project — potentially high growth, but comes with higher risk."
 
-    # Insight logic
-    if weight >= 0.3:
-        reasoning += "This coin has a **high weight**, reflecting strong confidence in its long-term stability or market dominance. "
-    elif weight >= 0.15:
-        reasoning += "This coin has a **moderate allocation**, indicating it's considered a core part of this risk profile. "
-    else:
-        reasoning += "This coin is a **smaller allocation**, possibly due to its niche use case or volatility. "
-
-    if coin in ["BTC", "ETH", "USDC"]:
-        reasoning += "It's a well-established coin with high market cap, suitable for preserving value."
-    elif coin in ["SOL", "MATIC", "LINK", "DOT", "ATOM"]:
-        reasoning += "This coin supports DeFi, scalability, or cross-chain features — aligned with growth sectors."
-    else:
-        reasoning += "It's a newer or emerging project — potentially high growth, but comes with higher risk."
-
-    st.markdown(f"**{info.get('name', coin)} ({coin})**")
-    st.caption(reasoning)
+        st.markdown(f"**{info.get('name', coin)} ({coin})**")
+        st.caption(reasoning)
 
 # Pie chart
 labels = [coin for coin, _ in st.session_state.suggested_portfolio]
