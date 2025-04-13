@@ -159,7 +159,32 @@ if st.session_state.suggested_portfolio:
             st.caption(info.get("desc", ""))
 
 
+# ============ INVESTMENT INSIGHTS ============
 
+st.subheader("🧠 Investment Insights")
+
+for coin, amount in sorted_portfolio:
+    info = coin_info.get(coin, {})
+    weight = amount / st.session_state.investment
+    reasoning = ""
+
+    # Insight logic
+    if weight >= 0.3:
+        reasoning += "This coin has a **high weight**, reflecting strong confidence in its long-term stability or market dominance. "
+    elif weight >= 0.15:
+        reasoning += "This coin has a **moderate allocation**, indicating it's considered a core part of this risk profile. "
+    else:
+        reasoning += "This coin is a **smaller allocation**, possibly due to its niche use case or volatility. "
+
+    if coin in ["BTC", "ETH", "USDC"]:
+        reasoning += "It's a well-established coin with high market cap, suitable for preserving value."
+    elif coin in ["SOL", "MATIC", "LINK", "DOT", "ATOM"]:
+        reasoning += "This coin supports DeFi, scalability, or cross-chain features — aligned with growth sectors."
+    else:
+        reasoning += "It's a newer or emerging project — potentially high growth, but comes with higher risk."
+
+    st.markdown(f"**{info.get('name', coin)} ({coin})**")
+    st.caption(reasoning)
 
 # Pie chart
 labels = [coin for coin, _ in st.session_state.suggested_portfolio]
@@ -174,6 +199,31 @@ def plot_portfolio_performance(portfolio_performance):
     fig = px.line(portfolio_performance, x="Date", y="Portfolio Value", title="Portfolio Performance Over Time")
     fig.update_layout(xaxis_title="Date", yaxis_title="Portfolio Value (USD)")
     fig.show()
+
+# ============ RISK PROFILE SUMMARY ============
+risk_summaries = {
+    "Low": """
+**Risk Level**: Low 🟢  
+**Volatility**: Minimal — stablecoins and blue-chip assets dominate.  
+**Diversification**: Moderate — fewer assets but generally stable.  
+**Suitability**: Best for conservative investors looking to preserve capital and earn modest returns.
+""",
+    "Medium": """
+**Risk Level**: Medium 🟡  
+**Volatility**: Moderate — mix of strong performers and growth coins.  
+**Diversification**: High — balanced across multiple sectors and use cases.  
+**Suitability**: Ideal for investors seeking growth with manageable risk.
+""",
+    "High": """
+**Risk Level**: High 🔴  
+**Volatility**: High — includes emerging assets with high return potential.  
+**Diversification**: Broad — but includes more speculative picks.  
+**Suitability**: For aggressive investors aiming for high returns with tolerance for volatility.
+"""
+}
+
+st.subheader("📊 Portfolio Risk Summary")
+st.markdown(risk_summaries[st.session_state.risk_level])
 
 
 # Reset button
