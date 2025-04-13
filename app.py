@@ -106,6 +106,11 @@ if "investment" not in st.session_state:
 if "suggested_portfolio" not in st.session_state:
     st.session_state.suggested_portfolio = []
 
+currency = st.selectbox("Select Currency for Value Conversion", ("USD", "PKR"))
+
+# Conversion rate (change this as needed)
+usd_to_pkr = 290  # Example conversion rate
+
 # Input form
 with st.form("portfolio_form"):
     risk_level = st.selectbox("Select your risk profile:", ["Low", "Medium", "High"], index=["Low", "Medium", "High"].index(st.session_state.risk_level))
@@ -113,13 +118,16 @@ with st.form("portfolio_form"):
     submitted = st.form_submit_button("Get Portfolio Suggestion")
 
     if submitted:
+        # Update session state with the selected values
         st.session_state.risk_level = risk_level
         st.session_state.investment = investment
-        pool = coin_pools[risk_level]
 
+        # Select coin pool based on risk profile
+        pool = coin_pools[risk_level]
         available_coins = [c[0] for c in pool]
         coin_weights_dict = {c[0]: c[1] for c in pool}
 
+        # Select random number of coins to include (up to 4)
         max_unique = min(4, len(available_coins))
         num_coins = random.choice([3, max_unique])
         selected_coins = random.sample(available_coins, k=num_coins)
@@ -131,16 +139,9 @@ with st.form("portfolio_form"):
 
         # Allocate based on normalized weights
         allocations = [investment * w for w in normalized_weights]
-        st.session_state.suggested_portfolio = list(zip(selected_coins, allocations))
+        st.session_state.suggested_portfolio = list(zip(selected_coins, allocations))  # Save the portfolio in session state
 
-
-currency = st.selectbox("Select Currency for Value Conversion", ("USD", "PKR"))
-
-# Conversion rate (change this as needed)
-usd_to_pkr = 290  # Example conversion rate
-
-
-# Show suggested portfolio
+# Show suggested portfolio only if available
 if st.session_state.suggested_portfolio:
     # Sorting portfolio by amount (largest to smallest)
     sorted_portfolio = sorted(st.session_state.suggested_portfolio, key=lambda x: x[1], reverse=True)
